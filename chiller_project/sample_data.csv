@@ -1,0 +1,17 @@
+timestamp,building,unit_id,equipment_type,power_kw,ton,status
+2026-03-10 08:00,Building A,CH-01,Chiller,200,420,Normal
+2026-03-10 08:00,Building A,CT-01,Cooling Tower,50,420,Normal
+2026-03-10 08:00,Building A,CP-01,Condenser Pump,30,420,Check
+2026-03-10 08:00,Building A,CHP-01,Chilled Pump,40,420,Normal
+2026-03-10 08:00,Building B,CH-01,Chiller,240,460,Warning
+2026-03-10 08:00,Building B,CT-01,Cooling Tower,60,460,Normal
+2026-03-10 08:00,Building B,CP-01,Condenser Pump,35,460,Check
+2026-03-10 08:00,Building B,CHP-01,Chilled Pump,45,460,Normal
+2026-03-10 09:00,Building A,CH-01,Chiller,210,430,Normal
+2026-03-10 09:00,Building A,CT-01,Cooling Tower,55,430,Normal
+2026-03-10 09:00,Building A,CP-01,Condenser Pump,31,430,Check
+2026-03-10 09:00,Building A,CHP-01,Chilled Pump,41,430,Normal
+2026-03-10 09:00,Building B,CH-01,Chiller,245,465,Warning
+2026-03-10 09:00,Building B,CT-01,Cooling Tower,61,465,Normal
+2026-03-10 09:00,Building B,CP-01,Condenser Pump,36,465,Check
+2026-03-10 09:00,Building B,CHP-01,Chilled Pump,46,465,Normal
