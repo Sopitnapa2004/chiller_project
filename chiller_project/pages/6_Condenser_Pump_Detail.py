@@ -1,83 +1,71 @@
-"""
-Condenser Pump Detail Page - Chiller System Dashboard
-Detailed monitoring and analysis for the Condenser Pump equipment.
-"""
-
 import streamlit as st
-from utils.data_loader import load_chiller_data, get_latest_row
-from components.styles import load_global_styles
+import config
+from components.charts import render_power_trend_chart
 from components.header import render_sidebar
 from components.navigation import render_back_button
-import config
+from components.styles import load_global_styles
+from components.tables import render_dataframe_section
+from services.diagnostic_service import apply_diagnostics
+from utils.data_loader import get_latest_snapshot, get_time_series, load_chiller_data
 
 
-def _initialize_session_state() -> None:
-    """Initialize session state with default values."""
+def initialize_session_state() -> None:
     if "target_power_ton" not in st.session_state:
         st.session_state.target_power_ton = config.DEFAULT_TARGET_POWER_TON
 
 
-def _load_data():
-    """Load data with error handling."""
-    try:
-        df = load_chiller_data(config.DEFAULT_DATA_FILE)
-        latest = get_latest_row(df)
-        return df, latest
-    except Exception as e:
-        st.error(f"❌ Error loading data: {e}")
-        st.stop()
-
-
-def _safe_efficiency(baseline: float, power: float) -> float:
-    """Safely calculate efficiency percentage."""
-    return (baseline / power * 100) if power > 0 else 0.0
-
-
 def main() -> None:
-    """Main page logic."""
-    st.set_page_config(page_title="Condenser Pump Detail", page_icon="🔧", layout="wide")
-    _initialize_session_state()
-    
+    st.set_page_config(page_title="Condenser Pump Detail", page_icon="💧", layout="wide")
+    initialize_session_state()
     load_global_styles()
     render_sidebar(st.session_state.target_power_ton)
     render_back_button()
-    
-    st.title("Condenser Pump Unit - Detailed Analysis")
-    st.write("📊 In-depth monitoring and performance metrics for the Condenser Pump")
-    
-    # Load data
-    df, latest = _load_data()
-    
-    # ==================== Current Overview ====================
-    st.markdown("### Current Overview")
-    
-    top1, top2 = st.columns([1, 3], gap="medium")
-    
-    with top1:
-        with st.container(border=True):
-            st.image(config.CONDENSER_PUMP_IMAGE_PATH, use_container_width=True)
-    
-    with top2:
-        with st.container(border=True):
-            pump_kw = latest.get("condenser_pump_kw", 0)
-            efficiency = _safe_efficiency(config.CONDENSER_PUMP_BASELINE_TON, pump_kw)
-            
-            st.write(f"**Status:** ⚠️ Check")
-            st.write(f"**Current Power:** {pump_kw:.1f} kW")
-            st.write(f"**Efficiency:** {efficiency:.1f}%")
-            st.write(f"**Baseline Capacity:** {config.CONDENSER_PUMP_BASELINE_TON} Ton")
-            st.info("This unit requires attention. Monitor for irregular power consumption patterns.")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # ==================== Trend Chart ====================
-    with st.container(border=True):
-        st.markdown("### Power Consumption Trend")
-        if "condenser_pump_kw" in df.columns:
-            chart_df = df[["timestamp", "condenser_pump_kw"]].copy().set_index("timestamp")
-            st.line_chart(chart_df, use_container_width=True)
-        else:
-            st.info("No trend data available")
+
+    st.markdown(
+        """
+        <div class="section-title" style="font-size: 1.8rem; margin-bottom: 4px;">💧 Condenser Pump Systems</div>
+        <div class="section-subtitle" style="font-size: 0.95rem; margin-bottom: 12px;">
+            Equipment diagnostics, performance trends, and operational analysis
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    raw_df = load_chiller_data(config.DEFAULT_DATA_FILE)
+    detail_raw = get_time_series(raw_df, equipment_type=config.EQUIPMENT_CONDENSER_PUMP)
+    detail_latest = apply_diagnostics(get_latest_snapshot(detail_raw), st.session_state.target_power_ton)
+
+    total_power = float(detail_latest["power_kw"].sum()) if not detail_latest.empty else 0.0
+    total_ton = float(detail_latest["ton"].sum()) if not detail_latest.empty else 0.0
+    kwrt = (total_power / total_ton) if total_ton > 0 else 0.0
+
+    m1, m2, m3, m4 = st.columns([1, 1.15, 1.15, 1], gap="small")
+    m1.metric("Units", int(detail_latest["unit_id"].nunique()) if not detail_latest.empty else 0)
+    m2.metric("Total Power", f"{total_power:.0f} kW")
+    m3.metric("Load", f"{total_ton:.0f} RT")
+    m4.metric("Power/Ton", f"{kwrt:.2f}")
+
+    st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
+
+    render_power_trend_chart(detail_raw, "Condenser Pump Performance Trend", height=285)
+
+    st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
+
+    render_dataframe_section(
+        "Condenser Pump Fleet - Operating Parameters",
+        detail_latest[[
+            "building",
+            "unit_id",
+            "power_kw",
+            "ton",
+            "power_per_ton",
+            "cond_water_flow",
+            "status",
+            "diagnosis",
+            "recommendation",
+        ]],
+        "Real-time operating metrics with thermohydraulic analysis and diagnostics",
+    )
 
 
 if __name__ == "__main__":

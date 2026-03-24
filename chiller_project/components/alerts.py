@@ -1,31 +1,25 @@
-"""
-Alert display components for the Chiller System Dashboard.
-"""
-
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import config
 
 
-def render_alerts_section(latest: pd.Series, target: float) -> None:
-    """
-    Render an alerts section showing power/ton status and recommendations.
-    
-    Args:
-        latest: Latest record as pandas Series with system metrics
-        target: Target power/ton threshold for comparison
-    """
+def render_alert_summary(alert_df: pd.DataFrame) -> None:
     with st.container(border=True):
-        st.markdown("### Alerts")
+        st.markdown('<div class="section-title">Alert Summary</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="section-subtitle">Current rule-based exceptions requiring attention</div>',
+            unsafe_allow_html=True,
+        )
 
-        if latest.get("power_per_ton", 0) > target:
-            st.warning("⚠️ Power/Ton สูงกว่าเป้าหมาย")
-            st.markdown("""
-            <div class="alert-list">
-            • ตรวจสอบ Condenser Pump<br>
-            • ตรวจสอบ Cooling Tower<br>
-            • ตรวจสอบโหลดของ Chiller
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.success("✅ ระบบอยู่ในเกณฑ์ปกติ")
+        if alert_df.empty:
+            st.success("No active alerts")
+            return
+
+        critical = int((alert_df["status"] == config.STATUS_CRITICAL).sum())
+        warning = int((alert_df["status"] == config.STATUS_WARNING).sum())
+        check = int((alert_df["status"] == config.STATUS_CHECK).sum())
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Critical", critical)
+        c2.metric("Warning", warning)
+        c3.metric("Check", check)

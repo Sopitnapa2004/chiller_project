@@ -1,105 +1,67 @@
-"""
-Configuration module for Chiller System Dashboard.
-Contains all constants and configuration settings used throughout the application.
-"""
+from pathlib import Path
 
-# ============================================================================
-# APPLICATION SETTINGS
-# ============================================================================
-APP_TITLE = "Chiller System Monitoring Dashboard"
+BASE_DIR = Path(__file__).resolve().parent
+IMAGES_DIR = BASE_DIR / "images"
+
+APP_TITLE = "Chiller System Operations Dashboard"
 APP_ICON = "❄️"
 LAYOUT = "wide"
+
 FACILITY_NAME = "SEAGATE KORAT FACILITY"
-FACILITY_SUBTITLE = "Chiller System Optimization & Analytics Dashboard"
+FACILITY_SUBTITLE = "Chiller Operations Dashboard"
 
-# ============================================================================
-# PERFORMANCE TARGETS & THRESHOLDS
-# ============================================================================
-DEFAULT_TARGET_POWER_TON = 0.75  # Default target power/ton ratio (kW/Ton)
-MIN_TARGET_POWER_TON = 0.10      # Minimum allowable target
-MAX_TARGET_POWER_TON = 2.00      # Maximum allowable target
+DEFAULT_TARGET_POWER_TON = 0.75
+MIN_TARGET_POWER_TON = 0.10
+MAX_TARGET_POWER_TON = 2.00
 
-# ============================================================================
-# EFFICIENCY BASELINES (for calculating component efficiency)
-# ============================================================================
-CHILLER_BASELINE_TON = 420        # Baseline ton capacity for chiller
-COOLING_TOWER_BASELINE_TON = 50   # Baseline ton for cooling tower
-CONDENSER_PUMP_BASELINE_TON = 30  # Baseline ton for condenser pump
-CHILLED_PUMP_BASELINE_TON = 40    # Baseline ton for chilled pump
+COND_APPROACH_WARNING_F = 5.0
+COND_APPROACH_CRITICAL_F = 7.0
+EVAP_APPROACH_WARNING_F = 5.0
+EVAP_APPROACH_CRITICAL_F = 7.0
+KWRT_WARNING_DELTA = 0.10
+KWRT_CRITICAL_DELTA = 0.20
 
-# ============================================================================
-# ALERT THRESHOLDS
-# ============================================================================
-ALERT_THRESHOLD_CRITICAL = 3      # Number of alerts to trigger critical status
-ALERT_THRESHOLD_WARNING = 1       # Number of alerts to trigger warning status
-ALERT_EFFICIENCY_THRESHOLD = 75   # Efficiency percentage for "Low" rating
+DEFAULT_DATA_FILE = str(BASE_DIR / "sample_data.csv")
+SEAGATE_LOGO_PATH = str(IMAGES_DIR / "seagate_logo.png")
+CHILLER_IMAGE_PATH = str(IMAGES_DIR / "chiller.png")
+COOLING_TOWER_IMAGE_PATH = str(IMAGES_DIR / "cooling_tower.png")
+CONDENSER_PUMP_IMAGE_PATH = str(IMAGES_DIR / "condenser_pump.png")
+CHILLED_PUMP_IMAGE_PATH = str(IMAGES_DIR / "chilled_pump.png")
 
-# ============================================================================
-# EFFICIENCY RATING THRESHOLDS
-# ============================================================================
-EFFICIENCY_EXCELLENT = 90         # >= 90% = Excellent
-EFFICIENCY_MODERATE = 75          # 75-89% = Moderate
-# < 75% = Low
-
-# ============================================================================
-# FILE PATHS
-# ============================================================================
-DEFAULT_DATA_FILE = "sample_data.csv"
-SEAGATE_LOGO_PATH = "images/seagate_logo.png"
-CHILLER_IMAGE_PATH = "images/chiller.png"
-COOLING_TOWER_IMAGE_PATH = "images/cooling_tower.png"
-CONDENSER_PUMP_IMAGE_PATH = "images/condenser_pump.png"
-CHILLED_PUMP_IMAGE_PATH = "images/chilled_pump.png"
-
-# ============================================================================
-# DATA SCHEMA
-# ============================================================================
-# Old schema (legacy support)
-OLD_SCHEMA_COLUMNS = {
-    "chiller_kw",
-    "cooling_tower_kw",
-    "condenser_pump_kw",
-    "chilled_pump_kw",
-    "ton",
-    "timestamp",
-}
-
-# New schema (multi-building, multi-unit)
-NEW_SCHEMA_COLUMNS = {
-    "building",
-    "unit_id",
-    "equipment_type",
-    "power_kw",
-    "ton",
-    "timestamp",
-}
-
-REQUIRED_COLUMNS = ["timestamp"]
-OPTIONAL_COLUMNS = ["building", "unit_id", "equipment_type", "status"]
-
-# ============================================================================
-# STATUS VALUES
-# ============================================================================
 STATUS_NORMAL = "Normal"
 STATUS_CHECK = "Check"
 STATUS_WARNING = "Warning"
 STATUS_CRITICAL = "Critical"
 STATUS_ALERT_VALUES = {STATUS_CHECK, STATUS_WARNING, STATUS_CRITICAL}
 
-# ============================================================================
-# EQUIPMENT TYPES
-# ============================================================================
 EQUIPMENT_CHILLER = "Chiller"
 EQUIPMENT_COOLING_TOWER = "Cooling Tower"
 EQUIPMENT_CONDENSER_PUMP = "Condenser Pump"
 EQUIPMENT_CHILLED_PUMP = "Chilled Pump"
 
-# ============================================================================
-# UI/UX SETTINGS
-# ============================================================================
-COLUMN_GAP = "medium"
-SIDEBAR_PADDING_TOP = "0.75rem"
-HEADER_MIN_HEIGHT = "108px"
-LOGO_WIDTH_SIDEBAR = 95
-LOGO_WIDTH_HEADER = 118
-Equipment_CARD_WIDTH = 105
+LOGO_WIDTH_SIDEBAR = 90
+LOGO_WIDTH_HEADER = 110
+EQUIPMENT_CARD_WIDTH = 110
+
+BUILDING_NAMES = [
+    "Building A",
+    "Building B",
+    "Building C",
+    "Building D",
+    "Building E",
+    "Building F",
+]
+
+DETAIL_PAGE_MAP = {
+    EQUIPMENT_CHILLER: "pages/4_Chiller_Detail.py",
+    EQUIPMENT_COOLING_TOWER: "pages/5_Cooling_Tower_Detail.py",
+    EQUIPMENT_CONDENSER_PUMP: "pages/6_Condenser_Pump_Detail.py",
+    EQUIPMENT_CHILLED_PUMP: "pages/7_Chilled_Pump_Detail.py",
+}
+
+EQUIPMENT_IMAGE_MAP = {
+    EQUIPMENT_CHILLER: CHILLER_IMAGE_PATH,
+    EQUIPMENT_COOLING_TOWER: COOLING_TOWER_IMAGE_PATH,
+    EQUIPMENT_CONDENSER_PUMP: CONDENSER_PUMP_IMAGE_PATH,
+    EQUIPMENT_CHILLED_PUMP: CHILLED_PUMP_IMAGE_PATH,
+}
